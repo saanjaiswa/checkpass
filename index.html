@@ -1,0 +1,144 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Hacker Style Password Strength Checker</title>
+  <link rel="stylesheet" href="./dist/output.css">
+  <style>
+    /* --- MATRIX HACKER BACKGROUND --- */
+    body {
+      margin: 0;
+      height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-direction: column;
+      color: #00ff9f;
+      font-family: 'Courier New', monospace;
+      background: black;
+      overflow: hidden;
+    }
+
+    canvas {
+      position: fixed;
+      top: 0;
+      left: 0;
+      z-index: -1;
+    }
+
+    /* --- CARD STYLE --- */
+    .card {
+      background: rgba(0, 0, 0, 0.75);
+      border: 1px solid #00ff9f;
+      box-shadow: 0 0 25px #00ff9f;
+      border-radius: 10px;
+      padding: 2rem;
+      text-align: center;
+      backdrop-filter: blur(8px);
+      width: 90%;
+      max-width: 400px;
+      transition: 0.3s ease-in-out;
+    }
+
+    .card:hover {
+      box-shadow: 0 0 35px #00ffcc, 0 0 55px #00ffaa;
+      transform: scale(1.03);
+    }
+
+    h1 {
+      font-size: 1.8rem;
+      margin-bottom: 1.5rem;
+      text-shadow: 0 0 10px #00ff9f;
+    }
+
+    input {
+      outline: none;
+      border: 1px solid #00ff9f;
+      background: black;
+      color: #00ff9f;
+      padding: 10px;
+      border-radius: 5px;
+      width: 100%;
+      text-align: center;
+      margin-bottom: 1rem;
+      font-family: 'Courier New', monospace;
+    }
+
+    #strength {
+      font-size: 1.1rem;
+      text-shadow: 0 0 10px #00ffaa;
+    }
+  </style>
+</head>
+<body>
+  <!-- Background Canvas -->
+  <canvas id="matrix"></canvas>
+
+  <!-- Password Checker Card -->
+  <div class="card">
+    <h1>💻 Password Strength Checker</h1>
+    <input id="password" type="password" placeholder="Enter password" />
+    <div id="strength"></div>
+  </div>
+
+  <script>
+    /* === MATRIX BACKGROUND EFFECT === */
+    const canvas = document.getElementById('matrix');
+    const ctx = canvas.getContext('2d');
+    canvas.height = window.innerHeight;
+    canvas.width = window.innerWidth;
+
+    const letters = "01#@$%&*<>{}[]/|";
+    const fontSize = 16;
+    const columns = canvas.width / fontSize;
+    const drops = [];
+
+    for (let x = 0; x < columns; x++) {
+      drops[x] = 1;
+    }
+
+    function draw() {
+      ctx.fillStyle = "rgba(0, 0, 0, 0.1)";
+      ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+      ctx.fillStyle = "#00ff9f";
+      ctx.font = fontSize + "px monospace";
+
+      for (let i = 0; i < drops.length; i++) {
+        const text = letters.charAt(Math.floor(Math.random() * letters.length));
+        ctx.fillText(text, i * fontSize, drops[i] * fontSize);
+
+        if (drops[i] * fontSize > canvas.height && Math.random() > 0.975) {
+          drops[i] = 0;
+        }
+        drops[i]++;
+      }
+    }
+
+    setInterval(draw, 35);
+
+    /* === PASSWORD STRENGTH CHECKER === */
+    const pass = document.getElementById('password');
+    const strength = document.getElementById('strength');
+
+    pass.addEventListener('input', () => {
+      const val = pass.value;
+      let score = 0;
+      if (val.length >= 8) score++;
+      if (/[A-Z]/.test(val)) score++;
+      if (/[0-9]/.test(val)) score++;
+      if (/[^A-Za-z0-9]/.test(val)) score++;
+
+      const levels = ["Weak 😟", "Fair 😐", "Good 🙂", "Strong 💪"];
+      strength.textContent = val ? levels[score - 1] || levels[0] : "";
+    });
+
+    /* --- Adjust canvas size on window resize --- */
+    window.addEventListener('resize', () => {
+      canvas.height = window.innerHeight;
+      canvas.width = window.innerWidth;
+    });
+  </script>
+</body>
+</html>
